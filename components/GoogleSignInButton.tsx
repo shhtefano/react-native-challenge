@@ -9,7 +9,10 @@ import { useRouter } from 'expo-router'
 WebBrowser.maybeCompleteAuthSession()
 
 export function GoogleSignInButton() {
+  
+  // eseugita soltanto per ios e android
   useWarmUpBrowser()
+  
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
   const router = useRouter()
 
@@ -20,7 +23,7 @@ export function GoogleSignInButton() {
       if (res?.createdSessionId && res.setActive) {
         await res.setActive({ session: res.createdSessionId })
 
-        router.replace('/(tabs)/profile')
+        router.replace('/profile')
       } else {
         console.warn('OAuth flow incomplete', res)
       }

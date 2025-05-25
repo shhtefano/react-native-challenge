@@ -13,13 +13,13 @@ export default function Page() {
       <Stack.Screen options={{ title: 'Jetop App!' }} />
 
       <SignedIn>
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+        <Text>Hello {user?.emailAddresses[0].emailAddress} :p</Text>
         <SignOutButton />
       </SignedIn>
 
 
       <SignedOut>
-
+        <Text>Welcome to Jetop App!</Text>
         <GoogleSignInButton />
 
       </SignedOut>

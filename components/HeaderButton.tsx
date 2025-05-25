@@ -1,14 +1,15 @@
 import { forwardRef } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Pressable, StyleSheet } from 'react-native';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 export const HeaderButton = forwardRef<typeof Pressable, { onPress?: () => void }>(
   ({ onPress }, ref) => {
     return (
       <Pressable onPress={onPress}>
         {({ pressed }) => (
-          <FontAwesome
-            name="info-circle"
+          <EvilIcons
+            name="user"
             size={25}
             color="gray"
             style={[
@@ -18,6 +19,7 @@ export const HeaderButton = forwardRef<typeof Pressable, { onPress?: () => void 
               },
             ]}
           />
+          //<EvilIcons name="user" size={24} color="black" />
         )}
       </Pressable>
     );

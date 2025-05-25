@@ -1,9 +1,8 @@
 import { Stack } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { ScreenContent } from '~/components/ScreenContent';
-import { Link } from "expo-router";
 
-export default function Home() {
+export default function Dicegame() {
   return (
     <>
       <Stack.Screen options={{ title: 'Dice game' }} />

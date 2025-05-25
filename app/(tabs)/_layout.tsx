@@ -15,7 +15,7 @@ export default function TabLayout() {
           title: 'Events',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/profile" asChild>
               <HeaderButton />
             </Link>
           ),
@@ -26,14 +26,33 @@ export default function TabLayout() {
         options={{
           title: 'Dicegame',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerRight: () => (
+            <Link href="/profile" asChild>
+              <HeaderButton />
+            </Link>
+          ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
+        
+      /> */}
+      <Tabs.Screen
+        name="nickname"
+        options={{
+          title: 'Nickname',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerRight: () => (
+            <Link href="/profile" asChild>
+              <HeaderButton />
+            </Link>
+          ),
+        }}
+        
       />
     </Tabs>
   );
