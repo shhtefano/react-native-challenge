@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from 'react-native'
+import { Text, Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import * as WebBrowser from 'expo-web-browser'
 import { useOAuth } from '@clerk/clerk-expo'
 import * as AuthSession from 'expo-auth-session'
@@ -32,6 +32,38 @@ export function GoogleSignInButton() {
     }
   }
 
-  return <Button title="Sign in with Google" onPress={handlePress} />
+  return (
+    <TouchableOpacity style={styles.button} onPress={handlePress}>
+      <Image
+        source={require('../assets/Google_logo.png')}
+        style={styles.icon}
+      />
+      <Text style={styles.text}>Sign in with Google</Text>
+    </TouchableOpacity>
+  )
 }
 
+
+const styles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal:10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    resizeMode: 'contain',
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#000',
+  },
+})

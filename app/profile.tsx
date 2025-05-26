@@ -1,45 +1,31 @@
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform } from 'react-native';
-
-// import { ScreenContent } from '~/components/ScreenContent';
-
-// export default function Modal() {
-//   return (
-//     <>
-//       <ScreenContent path="app/modal.tsx" title="Modal"></ScreenContent>
-//       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//     </>
-//   );
-// }
-
 import { Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
-import { ScreenContent } from '~/components/ScreenContent';
-import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
-import { Text } from 'react-native'
-import { SignOutButton } from '~/components/SignOutButton'
-import { Link } from 'expo-router'
+import { StyleSheet, View, Text, Image } from 'react-native';
+import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo';
 import { GoogleSignInButton } from '~/components/GoogleSignInButton';
-
+import { SignOutButton } from '~/components/SignOutButton';
 
 export default function Profile() {
-    const { user } = useUser()
+  const { user } = useUser();
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Profile' }} />
+      <Stack.Screen options={{
+        title: 'Profile',
+        headerBackTitle: 'Back',
+      }} />
       <View style={styles.container}>
-        {/* <ScreenContent path="app/(tabs)/profile.tsx" title="Profile" /> */}
-      <SignedIn>
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-        <SignOutButton />
-      </SignedIn>
-      <SignedOut>
-        <GoogleSignInButton />
-        <Link href="/(auth)/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </SignedOut>
+        <SignedIn>
+          <View style={styles.card}>
+            <Image source={{ uri: user?.imageUrl }} style={styles.avatar} />
+            <Text style={styles.name}>{user?.fullName}</Text>
+            <Text style={styles.email}>{user?.emailAddresses[0].emailAddress}</Text>
+            <SignOutButton />
+          </View>
+        </SignedIn>
+
+        <SignedOut>
+          <GoogleSignInButton />
+        </SignedOut>
       </View>
     </>
   );
@@ -48,6 +34,43 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+    backgroundColor: '#A29ED1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 40,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 300,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 16,
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  email: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 8,
+  },
+  info: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 20,
   },
 });

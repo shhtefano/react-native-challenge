@@ -7,7 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/nickname", (req, res) => {
-  const prompt = req.body.prompt || "Genera 5 nickname originali";
+  console.log("Richiesta ricevuta:", req.body);
+  if (!req.body.prompt) {
+    return res.status(400).json({ error: "Prompt mancante" });
+  }
+  const prompt = `Genera 5 nickname e restituiscili in un array JSON in questo modo: ${req.body.prompt}`  || "Genera 5 nickname e restituiscili in un array JSON";
   const ollama = spawn("ollama", ["run", "llama3"], {
     stdio: ["pipe", "pipe", "inherit"],
   });
