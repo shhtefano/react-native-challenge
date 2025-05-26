@@ -23,12 +23,11 @@ export default function Nickname() {
 
     return (
         <>
-            <Stack.Screen options={{ title: 'Nickname' }} />
+            <Stack.Screen options={{ title: 'Nickname Generator' }} />
             <View style={styles.container}>
                 {/* <ScreenContent path="app/(tabs)/profile.tsx" title="Profile" /> */}
                 <SignedIn>
                 <Text>Hello {user?.emailAddresses[0].emailAddress}!</Text>
-                <SignOutButton />
                 </SignedIn>
                 <SignedOut>
 
@@ -57,5 +56,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 24,
+        backgroundColor: '#A29ED1',
     },
 });

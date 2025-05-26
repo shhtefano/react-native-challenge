@@ -1,17 +1,15 @@
 import { forwardRef } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Pressable, StyleSheet } from 'react-native';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-
+import Feather from '@expo/vector-icons/Feather';
 export const HeaderButton = forwardRef<typeof Pressable, { onPress?: () => void }>(
   ({ onPress }, ref) => {
     return (
       <Pressable onPress={onPress}>
         {({ pressed }) => (
-          <EvilIcons
+          <Feather
             name="user"
-            size={25}
-            color="gray"
+            size={20}
+            color="white"
             style={[
               styles.headerRight,
               {

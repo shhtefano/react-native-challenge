@@ -6,12 +6,19 @@ import { SignOutButton } from '~/components/SignOutButton';
 
 export default function Profile() {
   const { user } = useUser();
-
+  
   return (
     <>
       <Stack.Screen options={{
         title: 'Profile',
         headerBackTitle: 'Back',
+        headerStyle: {
+          backgroundColor: '#7463B4',
+        },
+        headerTintColor: '#fff', // Testo e icone bianchi
+        headerTitleStyle: {
+          fontWeight: 'bold', // opzionale per rendere il titolo in grassetto
+        },
       }} />
       <View style={styles.container}>
         <SignedIn>
@@ -43,6 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 40,
+    marginBottom: 120, // Spazio tra la card e il bottone di sign out
     alignItems: 'center',
     width: '100%',
     maxWidth: 300,
