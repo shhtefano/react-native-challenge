@@ -1,61 +1,112 @@
 import { Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
-import { ScreenContent } from '~/components/ScreenContent';
-import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
-import { SignOutButton } from '~/components/SignOutButton'
-import { Link } from 'expo-router'
-import { GoogleSignInButton } from '~/components/GoogleSignInButton';
-import { useState } from "react";
-import { TextInput, Button, Text, ScrollView } from "react-native";
-import { generateNicknames } from "../../lib/ollama";
+import { StyleSheet, View, Text, TextInput, Button, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { SignedIn, useUser } from '@clerk/clerk-expo';
+import { useState } from 'react';
+import { generateNicknames } from '../../lib/ollama';
 
 export default function Nickname() {
-    const { user } = useUser()
-    const [prompt, setPrompt] = useState("");
-    const [results, setResults] = useState<string[]>([]);
+  const { user } = useUser();
+  const [prompt, setPrompt] = useState('');
+  const [results, setResults] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-    const handleGenerate = async () => {
-        console.log("Generating nicknames with prompt:", prompt);
-        
-        const names = await generateNicknames(prompt);
-        setResults(names);
-    };
+  const handleGenerate = async () => {
+    setLoading(true);
+    setResults([]);
+    const names = await generateNicknames(prompt);
+    setResults(names);
+    setLoading(false);
+  };
 
-    return (
-        <>
-            <Stack.Screen options={{ title: 'Nickname Generator' }} />
-            <View style={styles.container}>
-                {/* <ScreenContent path="app/(tabs)/profile.tsx" title="Profile" /> */}
-                <SignedIn>
-                <Text>Hello {user?.emailAddresses[0].emailAddress}!</Text>
-                </SignedIn>
-                <SignedOut>
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Nickname Generator' }} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.container}>
+          <SignedIn>
+            <Text style={styles.welcome}>Ciao, {user?.firstName} 👋</Text>
+          </SignedIn>
 
+          <Text style={styles.label}>Come vuoi che siano i tuoi nickname?</Text>
+          <TextInput
+            placeholder="Es. divertenti, fantasy, futuristici..."
+            value={prompt}
+            onChangeText={setPrompt}
+            style={styles.input}
+          />
+          {/* <Text style={styles.under_label}>PS: lascia vuoto per generare dei nickname casuali!</Text> */}
 
-                </SignedOut>
-                {/* <ScrollView className="p-4"> */}
-                    <TextInput
-                        placeholder="Descrivi lo stile dei nickname"
-                        value={prompt}
-                        onChangeText={setPrompt}
-                        className="border p-2 mb-2 rounded"
-                    />
-                    <Button title="Genera" onPress={handleGenerate} />
-                    {results.map((name, index) => (
-                        <Text key={index} className="mt-2 text-lg">
-                            {name}
-                        </Text>
-                    ))}
-                {/* </ScrollView> */}
-            </View>
-        </>
-    );
+          <View style={styles.button}>
+            <Button
+              title={loading ? "Generando..." : "Genera Nickname"}
+              color="#000"
+              onPress={handleGenerate}
+              disabled={loading || !prompt.trim()}
+            />
+          </View>
+
+          <View style={styles.resultsContainer}>
+            {results.map((name, index) => (
+              <View key={index} style={styles.nicknameCard}>
+                <Text style={styles.nickname}>✨ {name}</Text>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 24,
-        backgroundColor: '#A29ED1',
-    },
+  container: {
+    padding: 24,
+    backgroundColor: '#A29ED1',
+    flexGrow: 1,
+  },
+  welcome: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  under_label: {
+    fontSize: 12,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  button: {
+    marginBottom: 24,
+  },
+  resultsContainer: {
+    gap: 12,
+  },
+  nicknameCard: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  nickname: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#333',
+  },
 });

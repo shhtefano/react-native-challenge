@@ -11,7 +11,7 @@ app.post("/nickname", (req, res) => {
   if (!req.body.prompt) {
     return res.status(400).json({ error: "Prompt mancante" });
   }
-  const prompt = `Genera 5 nickname e restituiscili in un array JSON in questo modo: ${req.body.prompt}`  || "Genera 5 nickname e restituiscili in un array JSON";
+  const prompt = req.body.prompt  || "Genera 5 nickname e rispondi solamente con i nickname separati da una virgola";
   const ollama = spawn("ollama", ["run", "llama3"], {
     stdio: ["pipe", "pipe", "inherit"],
   });

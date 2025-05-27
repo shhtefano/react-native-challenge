@@ -3,6 +3,7 @@ import { HeaderButton } from '../../components/HeaderButton';
 import { TabBarIcon } from '../../components/TabBarIcon';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFonts } from 'expo-font';
+import { Image } from 'react-native';
 
 export default function TabLayout() {
 
@@ -18,19 +19,37 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
-        headerTitleStyle: { fontFamily: 'PlayRegular' },
-        headerStyle: {
-          backgroundColor: '#7463B4',
-          borderBottomColor: '#7463B4',
-        },
-        headerTintColor: '#fff', // testo/icona bianca
-        tabBarStyle: {
-          backgroundColor: '#000', // tab bar nera
-        },
-        tabBarActiveTintColor: '#A29ED1', // tab selezionata bianca
-        tabBarInactiveTintColor: 'white', // tab non selezionata grigia
-      }}>
+  screenOptions={{
+    headerStyle: {
+      backgroundColor: '#7463B4',
+      borderBottomColor: '#7463B4',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: { 
+      fontFamily: 'PlayRegular',
+      fontSize: 20,
+    },
+    headerTitleAlign: 'center', // Titolo centrato
+    tabBarStyle: {
+      backgroundColor: '#000',
+    },
+    tabBarActiveTintColor: '#A29ED1',
+    tabBarInactiveTintColor: 'white',
+
+    headerLeft: () => (
+      <Image
+        source={require('../../assets/jetop_logo.png')}
+        style={{ width: 60, height: 60, marginLeft: 4, marginBottom: 2 }}
+        resizeMode="contain"
+      />
+    ),
+    headerRight: () => (
+      <Link href="/profile" asChild>
+        <HeaderButton />
+      </Link>
+    ),
+  }}
+>
       <Tabs.Screen
         name="index"
         options={{
@@ -41,6 +60,7 @@ export default function TabLayout() {
               <HeaderButton />
             </Link>
           ),
+          
         }}
       />
       <Tabs.Screen

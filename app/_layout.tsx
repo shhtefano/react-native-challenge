@@ -5,7 +5,9 @@ import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo'
 import { tokenCache } from '@clerk/clerk-expo/token-cache'
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
-import { SplashScreen } from 'expo';
+import { Image } from 'react-native';
+import { Link } from 'expo-router';
+import {HeaderButton} from '../components/HeaderButton';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
@@ -22,7 +24,6 @@ export default function RootLayout() {
     return null;
   }
 
-
   return (
     <ClerkProvider
       publishableKey={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
@@ -31,6 +32,23 @@ export default function RootLayout() {
       <ClerkLoaded>
       <Stack screenOptions={{
         headerTitleStyle: { fontFamily: 'PlayRegular' },
+        headerStyle: {
+          backgroundColor: '#7463B4',
+        },
+        headerTitleAlign: 'center', // Titolo centrato
+    
+        // headerLeft: () => (
+        //   <Image
+        //     source={require('../assets/jetop_logo.png')}
+        //     style={{ width: 82, height: 82, marginLeft: 16 }}
+        //     resizeMode="contain"
+        //   />
+        // ),
+        headerRight: () => (
+          <Link href="/profile" asChild>
+            <HeaderButton />
+          </Link>
+        ),
       }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
