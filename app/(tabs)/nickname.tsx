@@ -1,14 +1,37 @@
 import { Stack } from 'expo-router';
-import { StyleSheet, View, Text, TextInput, Button, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SignedIn, useUser } from '@clerk/clerk-expo';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateNicknames } from '../../lib/ollama';
+import LottieView from 'lottie-react-native';
+
+const loadingMessages = [
+  "Sto pensando ai migliori nomi...",
+  "Quasi pronto...",
+  "Aggiungo un po' di magia...",
+  "Elaborazione in corso...",
+  "Caricamento della creatività...",
+];
 
 export default function Nickname() {
   const { user } = useUser();
   const [prompt, setPrompt] = useState('');
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Cambia il messaggio ogni 2s durante il caricamento
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+      }, 2000);
+    } else {
+      setMessageIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -20,7 +43,7 @@ export default function Nickname() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Nickname Generator' }} />
+      <Stack.Screen options={{ title: 'Nickname' }} />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -37,7 +60,6 @@ export default function Nickname() {
             onChangeText={setPrompt}
             style={styles.input}
           />
-          {/* <Text style={styles.under_label}>PS: lascia vuoto per generare dei nickname casuali!</Text> */}
 
           <View style={styles.button}>
             <Button
@@ -47,6 +69,19 @@ export default function Nickname() {
               disabled={loading || !prompt.trim()}
             />
           </View>
+
+          {/* 🔄 Animazione e messaggi durante il loading */}
+          {loading && (
+            <View style={styles.loadingBox}>
+              <LottieView
+                source={require('../../assets/animation/animation.json')}
+                autoPlay
+                loop
+                style={{ width: 150, height: 150 }}
+              />
+              <Text style={styles.loadingText}>{loadingMessages[messageIndex]}</Text>
+            </View>
+          )}
 
           <View style={styles.resultsContainer}>
             {results.map((name, index) => (
@@ -64,7 +99,7 @@ export default function Nickname() {
 const styles = StyleSheet.create({
   container: {
     padding: 24,
-    backgroundColor: '#A29ED1',
+    backgroundColor: '#121212',
     flexGrow: 1,
   },
   welcome: {
@@ -78,11 +113,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 8,
   },
-  under_label: {
-    fontSize: 12,
-    color: '#fff',
-    marginBottom: 8,
-  },
   input: {
     backgroundColor: '#fff',
     padding: 12,
@@ -91,6 +121,16 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 24,
+  },
+  loadingBox: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#fff',
+    fontStyle: 'italic',
   },
   resultsContainer: {
     gap: 12,

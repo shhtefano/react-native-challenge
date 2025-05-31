@@ -6,26 +6,31 @@ import { GoogleSignInButton } from '~/components/GoogleSignInButton'
 import { SignOutButton } from '~/components/SignOutButton'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Image } from 'react-native'
+import { StatusBar } from 'expo-status-bar';
 
 export default function Homepage() {
   const { user } = useUser()
 
   return (
     <LinearGradient
-      colors={[ '#38399A', '#9379C2']}
-      start={{ x: 1, y: 0}}
-      end={{ x: 0, y: 1 }}
+      colors={['#000000','#38399A','#9379C2','#000000' ]}
+      start={{ x: 0.8, y: 0.1 }}
+      end={{ x: 0.8, y: 0.9 }}
       style={styles.container}
     >
-      <Stack.Screen options={{ title: 'Jetop App' }} />
-      
-      <Image 
-        source={require('../../assets/jetop_logo.png')} 
+      <StatusBar style="light" />
+
+      <Stack.Screen options={{
+        title: '', headerTintColor: '#fff', headerBackTitle: 'Home', headerStyle: { backgroundColor: 'black' }, headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
+      }} />
+
+      <Image
+        source={require('../../assets/jetop_logo.png')}
         style={styles.logo}
         alt="Jetop Logo"
         width={200}
       />
-      
+
 
       <SignedIn>
         <Text style={[styles.text, { color: 'white' }]}>

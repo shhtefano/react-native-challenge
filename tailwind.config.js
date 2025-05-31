@@ -8,7 +8,7 @@ module.exports = {
       colors: {
         primary: "#4f46e5", // Indigo
         secondary: "#ec4899", // Pink
-        background: "#f9fafb", // Light gray
+        background: "#121212", // Light gray
         accent: "#10b981", // Emerald
         muted: "#6b7280", // Gray
       },

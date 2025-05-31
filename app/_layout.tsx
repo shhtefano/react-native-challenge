@@ -33,8 +33,9 @@ export default function RootLayout() {
       <Stack screenOptions={{
         headerTitleStyle: { fontFamily: 'PlayRegular' },
         headerStyle: {
-          backgroundColor: '#7463B4',
+          backgroundColor: '#121212',
         },
+        headerShadowVisible: false,     // disattiva ombra predefinita
         headerTitleAlign: 'center', // Titolo centrato
     
         // headerLeft: () => (

@@ -26,17 +26,17 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: 'white',
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'black',
-    marginTop: 16,
+    borderColor: 'lightgray',
+    marginTop: 5,
   },
   text: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'white', // rosso Google per coerenza
+    color: 'black', // rosso Google per coerenza
   },
 })
