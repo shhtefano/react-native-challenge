@@ -8,10 +8,9 @@ import { useEffect } from 'react';
 import { Image } from 'react-native';
 import { Link } from 'expo-router';
 import {HeaderButton} from '../components/HeaderButton';
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
+// export const unstable_settings = {
+//   initialRouteName: '(tabs)',
+// };
 
 export default function RootLayout() {
 
@@ -37,14 +36,7 @@ export default function RootLayout() {
         },
         headerShadowVisible: false,     // disattiva ombra predefinita
         headerTitleAlign: 'center', // Titolo centrato
-    
-        // headerLeft: () => (
-        //   <Image
-        //     source={require('../assets/jetop_logo.png')}
-        //     style={{ width: 82, height: 82, marginLeft: 16 }}
-        //     resizeMode="contain"
-        //   />
-        // ),
+
         headerRight: () => (
           <Link href="/profile" asChild>
             <HeaderButton />

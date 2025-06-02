@@ -48,7 +48,8 @@ export default function Nickname() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}   style={styles.scrollContainer}
+>
           <SignedIn>
             <Text style={styles.welcome}>Ciao, {user?.firstName} 👋</Text>
           </SignedIn>
@@ -102,6 +103,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     flexGrow: 1,
   },
+  scrollContainer: {
+  flex: 1,
+  backgroundColor: '#121212', // o '#121221' se preferisci
+},
   welcome: {
     fontSize: 18,
     fontWeight: '600',

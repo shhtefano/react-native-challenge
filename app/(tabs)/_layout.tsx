@@ -3,7 +3,8 @@ import { HeaderButton } from '../../components/HeaderButton';
 import { TabBarIcon } from '../../components/TabBarIcon';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFonts } from 'expo-font';
-import { Image } from 'react-native';
+import { Image, Touchable, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 
 export default function TabLayout() {
 
@@ -32,16 +33,26 @@ export default function TabLayout() {
     headerTitleAlign: 'center', // Titolo centrato
     tabBarStyle: {
       backgroundColor: '#000',
+      borderTopColor: '#121212',
     },
+    
     tabBarActiveTintColor: '#A29ED1',
     tabBarInactiveTintColor: 'white',
 
     headerLeft: () => (
+      <TouchableOpacity 
+        onPress={() => {
+          // Navigate to the homepage or perform any action
+          router.push('/');
+        }}
+        style={{ marginLeft: 10 }}
+      >
       <Image
         source={require('../../assets/jetop_logo.png')}
         style={{ width: 60, height: 60, marginLeft: 4, marginBottom: 2 }}
         resizeMode="contain"
       />
+      </TouchableOpacity>
     ),
     headerRight: () => (
       <Link href="/profile" asChild>
@@ -51,7 +62,7 @@ export default function TabLayout() {
   }}
 >
       <Tabs.Screen
-        name="index"
+        name="events"
         options={{
           title: 'Events',
           tabBarIcon: ({ color }) => <TabBarIcon name="ticket" color={color} />,

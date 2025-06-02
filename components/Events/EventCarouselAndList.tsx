@@ -22,22 +22,29 @@ type Event = {
 
 type Props = {
     events: Event[];
+    bookedEvents: Event[];
     userLocation: { latitude: number; longitude: number } | null;
     onBook: (event: Event) => void;
+    onCancel?: (event: Event) => void;
     onAddPress: () => void;
 };
 
 export default function EventCarouselAndList({
     events,
+    bookedEvents,
     userLocation,
     onBook,
+    onCancel,
     onAddPress
 }: Props) {
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredEvents = events.filter((e) =>
-        e.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredEvents = events
+        .filter((e) => !bookedEvents.some(b => b.id === e.id)) // esclude eventi già prenotati
+        .filter((e) =>
+            e.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
 
     const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
         const R = 6371;
@@ -51,9 +58,16 @@ export default function EventCarouselAndList({
         return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
     };
 
-    const renderEventCard = (e: Event, index: number, fullWidth = false) => (
+    const isPastEvent = (event: Event) => new Date(event.date) < new Date();
+
+    const renderEventCard = (
+        e: Event,
+        index: number,
+        fullWidth = false,
+        mode: 'normal' | 'booked' | 'past' = 'normal'
+    ) => (
         <View
-            key={e.id}
+            key={`${e.id}-${mode}`}
             style={[
                 styles.card,
                 fullWidth ? styles.cardFull : styles.cardCarousel
@@ -77,17 +91,39 @@ export default function EventCarouselAndList({
             <Text style={styles.booked}>
                 {e.booked_count} / {e.max_guests} posti prenotati
             </Text>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => onBook(e)}
-                disabled={e.booked_count >= e.max_guests}
-            >
-                <Text style={styles.buttonText}>
-                    {e.booked_count >= e.max_guests ? 'Completo' : 'Prenota'}
+
+            {mode === 'normal' && (
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => onBook(e)}
+                    disabled={e.booked_count >= e.max_guests}
+                >
+                    <Text style={styles.buttonText}>
+                        {e.booked_count >= e.max_guests ? 'Completo' : 'Prenota'}
+                    </Text>
+                </TouchableOpacity>
+            )}
+
+            {mode === 'booked' && !isPastEvent(e) && (
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: '#cf5e5e' }]}
+                    onPress={() => onCancel?.(e)} // <-- QUESTO VA GIÀ BENE!
+                >
+                    <Text style={styles.buttonText}>Disdici</Text>
+                </TouchableOpacity>
+            )}
+
+            {mode === 'past' && (
+                <Text style={[styles.buttonText, { color: '#ccc', marginTop: 10 }]}>
+                    Evento passato
                 </Text>
-            </TouchableOpacity>
+            )}
+
         </View>
     );
+
+    const futureBookings = bookedEvents.filter(e => !isPastEvent(e));
+    const pastBookings = bookedEvents.filter(isPastEvent);
 
     return (
         <View>
@@ -105,14 +141,72 @@ export default function EventCarouselAndList({
                 </TouchableOpacity>
             </View>
 
-
             <Text style={styles.subsectionTitle}>In evidenza</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
-                {events.slice(0, 5).map((e, idx) => renderEventCard(e, idx, false))}
+                {events
+                    .filter(e => !isPastEvent(e))
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .slice(0, 4)
+                    .map((e, idx) => {
+                        const isBooked = bookedEvents.some(b => b.id === e.id);
+                        return (
+                            <View
+                                key={`highlight-${e.id}`}
+                                style={[styles.card, styles.cardCarousel]}
+                            >
+                                <Text style={styles.eventTitle}>{e.title}</Text>
+                                <Text style={styles.date}>{new Date(e.date).toLocaleString()}</Text>
+                                <Text style={styles.location}>{e.location}</Text>
+                                {userLocation && (
+                                    <Text style={styles.distance}>
+                                        Distanza:{' '}
+                                        {calcDistance(
+                                            userLocation.latitude,
+                                            userLocation.longitude,
+                                            e.latitude,
+                                            e.longitude
+                                        )}{' '}
+                                        km
+                                    </Text>
+                                )}
+                                <Text style={styles.booked}>
+                                    {e.booked_count} / {e.max_guests} posti prenotati
+                                </Text>
+                                {isBooked ? (
+                                    <Text style={[styles.buttonText, { marginTop: 10, color: '#ccc' }]}>
+                                        Complimenti! Sei accreditato a questo evento.
+                                    </Text>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={styles.button}
+                                        onPress={() => onBook(e)}
+                                        disabled={e.booked_count >= e.max_guests}
+                                    >
+                                        <Text style={styles.buttonText}>
+                                            {e.booked_count >= e.max_guests ? 'Completo' : 'Prenota'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        );
+                    })}
             </ScrollView>
 
+
+
             <Text style={styles.subsectionTitle}>Tutti gli eventi</Text>
-            {filteredEvents.map((e, idx) => renderEventCard(e, idx, true))}
+            {filteredEvents
+                .filter(e => !isPastEvent(e))
+                .map((e, idx) => renderEventCard(e, idx, true, 'normal'))}
+
+
+
+            {pastBookings.length > 0 && (
+                <>
+                    <Text style={styles.subsectionTitle}>Eventi passati</Text>
+                    {pastBookings.map((e, idx) => renderEventCard(e, idx, true, 'past'))}
+                </>
+            )}
         </View>
     );
 }
@@ -124,7 +218,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         gap: 12,
     },
-
     searchInput: {
         flex: 1,
         backgroundColor: '#1e1e1e',
@@ -132,7 +225,6 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
     },
-
     addButton: {
         padding: 4,
     },

@@ -1,12 +1,13 @@
 import React from 'react'
 import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
-import { Stack } from 'expo-router'
+import { router, Stack } from 'expo-router'
 import { Text, View, StyleSheet } from 'react-native'
 import { GoogleSignInButton } from '~/components/GoogleSignInButton'
 import { SignOutButton } from '~/components/SignOutButton'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Image } from 'react-native'
 import { StatusBar } from 'expo-status-bar';
+import { Button } from '~/components/Button'
 
 export default function Homepage() {
   const { user } = useUser()
@@ -34,9 +35,14 @@ export default function Homepage() {
 
       <SignedIn>
         <Text style={[styles.text, { color: 'white' }]}>
-          <Text>Welcome back, {user?.fullName}!</Text>
+          <Text>Salve, {user?.fullName}!</Text>
 
         </Text>
+        <View style={{flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20}}>
+
+        <Button title="I miei ticket" onPress={() => {router.push('/tickets')}} style={{ marginBottom: 20, backgroundColor: '#121212', borderRadius: 10 }} />
+        <Button title="Eventi" onPress={() => {router.push('/(tabs)/events')}} style={{ marginBottom: 20, backgroundColor: '#121212', borderRadius: 10 }} />
+         </View> 
         <SignOutButton />
       </SignedIn>
 
