@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     paddingHorizontal:10,
     borderRadius: 6,
     borderWidth: 1,
+    justifyContent: 'center',
     borderColor: '#ddd',
   },
   icon: {

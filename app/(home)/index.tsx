@@ -14,7 +14,7 @@ export default function Homepage() {
 
   return (
     <LinearGradient
-      colors={['#000000','#38399A','#9379C2','#000000' ]}
+      colors={['#000000', '#38399A', '#9379C2', '#000000']}
       start={{ x: 0.8, y: 0.1 }}
       end={{ x: 0.8, y: 0.9 }}
       style={styles.container}
@@ -22,7 +22,7 @@ export default function Homepage() {
       <StatusBar style="light" />
 
       <Stack.Screen options={{
-        title: '', headerTintColor: '#fff', headerBackTitle: 'Home', headerStyle: { backgroundColor: 'black' }, headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
+        title: 'Home', headerTintColor: '#fff', headerBackTitle: 'Home', headerStyle: { backgroundColor: 'black' }, headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
       }} />
 
       <Image
@@ -34,19 +34,46 @@ export default function Homepage() {
 
 
       <SignedIn>
+        <Stack.Screen options={{
+          title: 'Home',
+          headerTintColor: '#fff',
+          headerBackTitle: 'Home',
+          headerStyle: { backgroundColor: 'black' },
+          headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
+          headerRight: () => (
+            // qui puoi mettere ad esempio una foto profilo se vuoi
+            <Image
+              source={{ uri: user?.imageUrl }}
+              style={{ width: 32, height: 32, borderRadius: 16, marginRight: 10 }}
+            />
+          ),
+        }} />
         <Text style={[styles.text, { color: 'white' }]}>
           <Text>Salve, {user?.fullName}!</Text>
 
         </Text>
-        <View style={{flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20}}>
+        <Button title="Entra" onPress={() => { router.replace('/(tabs)/events') }} style={{
+          alignItems: 'center',
+          backgroundColor: 'black',
+          paddingVertical: 8,
+          paddingHorizontal: 14,
+          borderRadius: 12,
+          borderWidth: 1,
+          marginTop: 5,
+        }} />
 
-        <Button title="I miei ticket" onPress={() => {router.push('/tickets')}} style={{ marginBottom: 20, backgroundColor: '#121212', borderRadius: 10 }} />
-        <Button title="Eventi" onPress={() => {router.push('/(tabs)/events')}} style={{ marginBottom: 20, backgroundColor: '#121212', borderRadius: 10 }} />
-         </View> 
         <SignOutButton />
       </SignedIn>
 
       <SignedOut>
+        <Stack.Screen options={{
+          title: 'Home',
+          headerTintColor: '#fff',
+          headerBackTitle: 'Home',
+          headerStyle: { backgroundColor: 'black' },
+          headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
+          headerRight: () => null,
+        }} />
         <GoogleSignInButton />
       </SignedOut>
     </LinearGradient>

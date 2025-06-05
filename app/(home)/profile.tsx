@@ -4,16 +4,19 @@ import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo';
 import { GoogleSignInButton } from '~/components/GoogleSignInButton';
 import { SignOutButton } from '~/components/SignOutButton';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Button } from '~/components/Button';
+import { useRouter } from 'expo-router';
+
 export default function Profile() {
   const { user } = useUser();
-
+  const router = useRouter();
   return (
-        <LinearGradient
-          colors={['#121212','#38399A','#9379C2','#121212' ]}
-          start={{ x: 0.8, y: 0.1 }}
-          end={{ x: 0.8, y: 0.9 }}
-          style={styles.container}
-        >
+    <LinearGradient
+      colors={['#121212', '#38399A', '#9379C2', '#121212']}
+      start={{ x: 0.8, y: 0.1 }}
+      end={{ x: 0.8, y: 0.9 }}
+      style={styles.container}
+    >
 
       <Stack.Screen
         options={{
@@ -22,12 +25,15 @@ export default function Profile() {
           headerStyle: {
             backgroundColor: '#121212',
           },
-          headerShadowVisible: false,     // disattiva ombra predefinita
+          // headerShadowVisible: false,
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
           },
+          headerRight: () => null,
+        
         }}
+
       />
 
       <View style={styles.container}>
@@ -36,6 +42,11 @@ export default function Profile() {
             <Image source={{ uri: user?.imageUrl }} style={styles.avatar} />
             <Text style={styles.name}>{user?.fullName}</Text>
             <Text style={styles.email}>{user?.emailAddresses[0].emailAddress}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 40 }}>
+
+              <Button title="Eventi" onPress={() => { router.replace('/(tabs)/events') }} style={{ backgroundColor: '#121212', borderRadius: 10 }} />
+              <Button title="I miei ticket" onPress={() => { router.replace('/tickets') }} style={{ backgroundColor: '#121212', borderRadius: 10 }} />
+            </View>
             <SignOutButton />
           </View>
         </SignedIn>
@@ -54,7 +65,7 @@ const styles = StyleSheet.create({
     // backgroundColor: '#121212',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 40,
+    paddingVertical: 20,
   },
   card: {
     backgroundColor: '#121212',

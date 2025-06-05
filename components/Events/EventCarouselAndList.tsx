@@ -8,7 +8,11 @@ import {
     StyleSheet
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { useRouter } from 'expo-router';
+import TicketCard from './TicketCard'; // Assicurati di avere il percorso corretto per il componente TicketCard
+import QRCode from 'react-native-qrcode-svg';
+import { Modal } from 'react-native';
+import { useUser } from '@clerk/clerk-expo';
 type Event = {
     id: string;
     title: string;
@@ -19,7 +23,6 @@ type Event = {
     max_guests: number;
     booked_count: number;
 };
-
 type Props = {
     events: Event[];
     bookedEvents: Event[];
@@ -27,7 +30,9 @@ type Props = {
     onBook: (event: Event) => void;
     onCancel?: (event: Event) => void;
     onAddPress: () => void;
+    isLoggedIn: boolean;
 };
+
 
 export default function EventCarouselAndList({
     events,
@@ -35,15 +40,23 @@ export default function EventCarouselAndList({
     userLocation,
     onBook,
     onCancel,
-    onAddPress
+    onAddPress,
+    isLoggedIn,
 }: Props) {
     const [searchQuery, setSearchQuery] = useState('');
+    const router = useRouter();
+    const [selectedQrCode, setSelectedQrCode] = useState<string | null>(null);
+    const { user } = useUser();
+
+    const isPastEvent = (event: Event) => new Date(event.date) < new Date();
+
 
     const filteredEvents = events
-        .filter((e) => !bookedEvents.some(b => b.id === e.id)) // esclude eventi già prenotati
         .filter((e) =>
             e.title.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        )
+        .filter(e => !isPastEvent(e)); // lasciamo solo futuri
+
 
 
     const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -58,7 +71,6 @@ export default function EventCarouselAndList({
         return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
     };
 
-    const isPastEvent = (event: Event) => new Date(event.date) < new Date();
 
     const renderEventCard = (
         e: Event,
@@ -68,31 +80,54 @@ export default function EventCarouselAndList({
     ) => (
         <View
             key={`${e.id}-${mode}`}
-            style={[
-                styles.card,
-                fullWidth ? styles.cardFull : styles.cardCarousel
-            ]}
+            style={[styles.card, fullWidth ? styles.cardFull : styles.cardCarousel]}
         >
-            <Text style={styles.eventTitle}>{e.title}</Text>
-            <Text style={styles.date}>{new Date(e.date).toLocaleString()}</Text>
-            <Text style={styles.location}>{e.location}</Text>
-            {userLocation && (
-                <Text style={styles.distance}>
-                    Distanza:{' '}
-                    {calcDistance(
-                        userLocation.latitude,
-                        userLocation.longitude,
-                        e.latitude,
-                        e.longitude
-                    )}{' '}
-                    km
-                </Text>
-            )}
-            <Text style={styles.booked}>
-                {e.booked_count} / {e.max_guests} posti prenotati
-            </Text>
+            <View style={styles.row}>
+                {/* Colonna sinistra: Info evento */}
+                <View style={styles.leftColumn}>
+                    <Text style={styles.eventTitle}>{e.title}</Text>
+                    <Text style={styles.date}>
+                        {new Date(e.date).toLocaleString('it-IT', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                        })}
+                    </Text>
+                    <Text style={styles.location}>{e.location}</Text>
+                    {userLocation && (
+                        <Text style={styles.distance}>
+                            Distanza: {calcDistance(userLocation.latitude, userLocation.longitude, e.latitude, e.longitude)} km
+                        </Text>
+                    )}
+                    <Text style={styles.booked}>
+                        {e.booked_count} / {e.max_guests} posti prenotati
+                    </Text>
 
-            {mode === 'normal' && (
+
+                </View>
+
+                {/* Colonna destra: QR */}
+                {mode === 'booked' && (
+                    <TouchableOpacity style={styles.rightColumn} onPress={() => setSelectedQrCode(e.id)}>
+                        <Text style={styles.qrHint}>Tocca per ingrandire</Text>
+                        <View style={{
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 1,
+                            padding: 5,
+                            backgroundColor: '#fff',
+                        }}>
+                            <QRCode value={e.id} size={100} />
+                        </View>
+                    </TouchableOpacity>
+                )}
+
+            </View>
+            {/* Prenotazione/disdetta */}
+            {mode === 'normal' && isLoggedIn && (
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => onBook(e)}
@@ -104,26 +139,25 @@ export default function EventCarouselAndList({
                 </TouchableOpacity>
             )}
 
-            {mode === 'booked' && !isPastEvent(e) && (
-                <TouchableOpacity
-                    style={[styles.button, { backgroundColor: '#cf5e5e' }]}
-                    onPress={() => onCancel?.(e)} // <-- QUESTO VA GIÀ BENE!
-                >
-                    <Text style={styles.buttonText}>Disdici</Text>
-                </TouchableOpacity>
-            )}
+            {mode === 'booked' && (
+                <>
 
-            {mode === 'past' && (
-                <Text style={[styles.buttonText, { color: '#ccc', marginTop: 10 }]}>
-                    Evento passato
-                </Text>
+                    {!isPastEvent(e) && isLoggedIn && (
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: '#cf5e5e' }]}
+                            onPress={() => onCancel?.(e)}
+                        >
+                            <Text style={styles.buttonText}>Disdici</Text>
+                        </TouchableOpacity>
+                    )}
+                </>
             )}
-
         </View>
+
     );
 
     const futureBookings = bookedEvents.filter(e => !isPastEvent(e));
-    const pastBookings = bookedEvents.filter(isPastEvent);
+    const past = bookedEvents.filter(isPastEvent);
 
     return (
         <View>
@@ -136,9 +170,9 @@ export default function EventCarouselAndList({
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                 />
-                <TouchableOpacity onPress={onAddPress} style={styles.addButton}>
+                {isLoggedIn && <TouchableOpacity onPress={onAddPress} style={styles.addButton}>
                     <Ionicons name="add-circle-outline" size={32} color="#fff" />
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
 
             <Text style={styles.subsectionTitle}>In evidenza</Text>
@@ -146,7 +180,7 @@ export default function EventCarouselAndList({
                 {events
                     .filter(e => !isPastEvent(e))
                     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                    .slice(0, 4)
+                    .slice(0, 3)
                     .map((e, idx) => {
                         const isBooked = bookedEvents.some(b => b.id === e.id);
                         return (
@@ -155,7 +189,14 @@ export default function EventCarouselAndList({
                                 style={[styles.card, styles.cardCarousel]}
                             >
                                 <Text style={styles.eventTitle}>{e.title}</Text>
-                                <Text style={styles.date}>{new Date(e.date).toLocaleString()}</Text>
+                                <Text style={styles.date}>{new Date(e.date).toLocaleString('it-IT', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                })}</Text>
                                 <Text style={styles.location}>{e.location}</Text>
                                 {userLocation && (
                                     <Text style={styles.distance}>
@@ -193,20 +234,48 @@ export default function EventCarouselAndList({
             </ScrollView>
 
 
-
             <Text style={styles.subsectionTitle}>Tutti gli eventi</Text>
             {filteredEvents
-                .filter(e => !isPastEvent(e))
+                .filter(e => !bookedEvents.some(b => b.id === e.id))
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                 .map((e, idx) => renderEventCard(e, idx, true, 'normal'))}
 
+            {filteredEvents
+                .filter(e => bookedEvents.some(b => b.id === e.id))
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .map((e, idx) => renderEventCard(e, idx, true, 'booked'))}
 
 
-            {pastBookings.length > 0 && (
-                <>
-                    <Text style={styles.subsectionTitle}>Eventi passati</Text>
-                    {pastBookings.map((e, idx) => renderEventCard(e, idx, true, 'past'))}
-                </>
+            <Text style={styles.heading}>Eventi passati</Text>
+            {past.length > 0 ? (
+                past.map((e) => (
+                    <TicketCard
+                        key={`past-${e.id}`}
+                        event={e}
+                        isPast={true}
+                    />
+                ))
+            ) : (
+                <Text style={styles.emptyText}>Nessun evento passato.</Text>
             )}
+            <Modal visible={!!selectedQrCode} transparent animationType="fade" onRequestClose={() => setSelectedQrCode(null)}>
+                <View style={styles.modalContainer}>
+                    <TouchableOpacity style={styles.modalBackground} onPress={() => setSelectedQrCode(null)} />
+                    <View style={styles.modalContent}>
+                        {selectedQrCode && (
+                            <>
+                                <QRCode
+                                    value={user?.emailAddresses[0]?.emailAddress + '_' + selectedQrCode}
+                                    size={250}
+                                />
+                                <Text style={{ color: '#fff', marginTop: 16 }}>Tocca fuori per chiudere</Text>
+                            </>
+                        )}
+                    </View>
+                </View>
+            </Modal>
+
+
         </View>
     );
 }
@@ -218,6 +287,43 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         gap: 12,
     },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    leftColumn: {
+        flex: 1,
+        paddingRight: 8,
+    },
+    rightColumn: {
+        marginTop: 0,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    qrHint: {
+        color: '#aaa',
+        fontSize: 12,
+        marginBottom: 8,
+
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+    },
+    modalBackground: {
+        ...StyleSheet.absoluteFillObject,
+    },
+    modalContent: {
+        backgroundColor: '#1e1e1e',
+        padding: 20,
+        borderRadius: 16,
+        alignItems: 'center',
+    }
+    ,
     searchInput: {
         flex: 1,
         backgroundColor: '#1e1e1e',
@@ -227,6 +333,20 @@ const styles = StyleSheet.create({
     },
     addButton: {
         padding: 4,
+    },
+
+
+    heading: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: 26,
+        marginBottom: 26,
+    },
+    emptyText: {
+        color: '#ccc',
+        fontStyle: 'italic',
+        marginBottom: 16,
     },
     sectionTitle: {
         fontSize: 24,

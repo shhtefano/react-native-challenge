@@ -29,6 +29,6 @@ app.post("/nickname", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
+app.listen(3001, '0.0.0.0', () => {
   console.log("API Ollama attiva su http://localhost:3001");
 });

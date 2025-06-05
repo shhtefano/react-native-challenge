@@ -55,23 +55,35 @@ export default function Events() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Eventi' }} />
+      <Stack.Screen options={{
+        title: 'Eventi', headerTintColor: '#fff', headerBackVisible: false,
+        gestureEnabled: false,
+      }} />
       <View style={styles.container}>
         <ScrollView>
-          <TouchableOpacity
-            onPress={() => router.push('/(events)/tickets')}
-          >
-            <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>🎫 TICKETS</Text>
-          </TouchableOpacity>
+
+
+          {user?.emailAddresses?.[0]?.emailAddress && (
+            <TouchableOpacity
+              onPress={() => router.push('/(events)/tickets')}
+              style={styles.reservationsButton}
+            >
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>Le mie prenotazioni</Text>
+            </TouchableOpacity>
+          )}
+
+
 
           <EventCarouselAndList
-            events={events}
-            bookedEvents={bookedEvents}
-            userLocation={userLocation}
-            onBook={handleBooking}
-            onCancel={handleCancel}
-            onAddPress={() => router.push('/create-event')}
-          />
+  events={events}
+  bookedEvents={bookedEvents}
+  userLocation={userLocation}
+  onBook={handleBooking}
+  onCancel={handleCancel}
+  onAddPress={() => router.push('/create-event')}
+  isLoggedIn={!!user?.emailAddresses?.[0]?.emailAddress}
+/>
+
         </ScrollView>
       </View>
     </>
@@ -84,4 +96,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     padding: 16,
   },
+
+  reservationsButton: {
+    backgroundColor: '#121212',
+    padding: 10,
+    borderColor: '#e4c7f3',
+    borderWidth: 1,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginBottom: 36,
+    fontSize: 10,
+    width: '50%',
+    alignSelf: 'center',
+  }
 });

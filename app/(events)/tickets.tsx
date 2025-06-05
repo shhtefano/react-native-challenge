@@ -22,39 +22,36 @@ export default function TicketsPage() {
   }, [fetchBookings]);
 
   const future = bookedEvents.filter((e) => !isPastEvent(e));
-  const past = bookedEvents.filter(isPastEvent);
 
   return (
     <>
-      <Stack.Screen options={{ title: 'I miei biglietti' }} />
-      <ScrollView style={styles.container}>
-        <Text style={styles.heading}>Eventi futuri</Text>
-        {future.length > 0 ? (
-          future.map((e) => (
-            <TicketCard
-              key={`future-${e.id}`}
-              event={e}
-              isPast={false}
-              onCancelled={fetchBookings}
-            />
-          ))
-        ) : (
-          <Text style={styles.emptyText}>Nessuna prenotazione attiva.</Text>
-        )}
-
-        <Text style={styles.heading}>Eventi passati</Text>
-        {past.length > 0 ? (
-          past.map((e) => (
-            <TicketCard
-              key={`past-${e.id}`}
-              event={e}
-              isPast={true}
-            />
-          ))
-        ) : (
-          <Text style={styles.emptyText}>Nessun evento passato.</Text>
-        )}
-      </ScrollView>
+      <Stack.Screen
+        options={{
+          title: 'Prenotazioni',
+          headerTintColor: '#fff',
+          headerBackTitle: 'Indietro',
+          headerStyle: { backgroundColor: 'black' },
+          headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
+        }}
+      />
+      <View style={{ flex: 1, backgroundColor: '#121212' }}>
+        <ScrollView style={{ flex: 1 }}
+          contentContainerStyle={styles.container}>
+          <Text style={styles.heading}>Eventi a cui sei accreditato</Text>
+          {future.length > 0 ? (
+            future.map((e) => (
+              <TicketCard
+                key={`${e.id}`}
+                event={e}
+                isPast={false}
+                onCancelled={fetchBookings}
+              />
+            ))
+          ) : (
+            <Text style={styles.emptyText}>Nessuna prenotazione attiva.</Text>
+          )}
+        </ScrollView>
+      </View>
     </>
   );
 }
@@ -63,13 +60,14 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#121212',
     padding: 16,
+    marginBottom: 20,
   },
   heading: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 26,
+    marginBottom: 26,
   },
   emptyText: {
     color: '#ccc',
