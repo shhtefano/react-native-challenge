@@ -2,12 +2,12 @@ import React from 'react'
 import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
 import { router, Stack } from 'expo-router'
 import { Text, View, StyleSheet } from 'react-native'
-import { GoogleSignInButton } from '~/components/GoogleSignInButton'
-import { SignOutButton } from '~/components/SignOutButton'
+import { GoogleSignInButton } from '~/components/Authentication/GoogleSignInButton'
+import { SignOutButton } from '~/components/Authentication/SignOutButton'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Image } from 'react-native'
 import { StatusBar } from 'expo-status-bar';
-import { Button } from '~/components/Button'
+import { Button } from '~/components/General/Button'
 
 export default function Homepage() {
   const { user } = useUser()
@@ -74,8 +74,23 @@ export default function Homepage() {
           headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
           headerRight: () => null,
         }} />
+
+        <Button
+          title="Entra come ospite"
+          onPress={() => { router.replace('/(tabs)/events') }}
+          style={{
+            alignItems: 'center',
+            backgroundColor: '#121212',
+            paddingVertical: 8,
+            paddingHorizontal: 14,
+            borderRadius: 10,
+            marginBottom: 20,
+          }}
+        />
         <GoogleSignInButton />
+
       </SignedOut>
+
     </LinearGradient>
   )
 }

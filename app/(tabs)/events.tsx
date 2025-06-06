@@ -1,12 +1,12 @@
 import { Stack } from 'expo-router';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from 'react';
 import * as Location from 'expo-location';
 import { getEvents, bookEvent, getBookingsByMail, cancelBooking } from '../../lib/events';
 import EventCarouselAndList from '../../components/Events/EventCarouselAndList';
 import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
-import { TouchableOpacity, Text } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 export default function Events() {
   const [events, setEvents] = useState<any[]>([]);
   const [bookedEvents, setBookedEvents] = useState<any[]>([]);
@@ -14,23 +14,25 @@ export default function Events() {
   const router = useRouter();
   const { user } = useUser();
 
-  useEffect(() => {
-    getEvents().then(setEvents).catch(console.error);
+  useFocusEffect(
+    useCallback(() => {
+      getEvents().then(setEvents).catch(console.error);
 
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const location = await Location.getCurrentPositionAsync({});
-        setUserLocation(location.coords);
+      if (user?.emailAddresses[0]?.emailAddress) {
+        getBookingsByMail(user.emailAddresses[0].emailAddress)
+          .then(setBookedEvents)
+          .catch(console.error);
       }
-    })();
 
-    if (user?.emailAddresses[0].emailAddress) {
-      getBookingsByMail(user.emailAddresses[0].emailAddress)
-        .then(setBookedEvents)
-        .catch(console.error);
-    }
-  }, [user]);
+      (async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const location = await Location.getCurrentPositionAsync({});
+          setUserLocation(location.coords);
+        }
+      })();
+    }, [user])
+  );
 
   const handleBooking = async (event: any) => {
     if (event.booked_count < event.max_guests) {
@@ -57,32 +59,25 @@ export default function Events() {
     <>
       <Stack.Screen options={{
         title: 'Eventi', headerTintColor: '#fff', headerBackVisible: false,
-        gestureEnabled: false,
+        gestureEnabled: false, headerStyle: { backgroundColor: 'black' },
+
       }} />
       <View style={styles.container}>
         <ScrollView>
 
 
-          {user?.emailAddresses?.[0]?.emailAddress && (
-            <TouchableOpacity
-              onPress={() => router.push('/(events)/tickets')}
-              style={styles.reservationsButton}
-            >
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>Le mie prenotazioni</Text>
-            </TouchableOpacity>
-          )}
 
 
 
           <EventCarouselAndList
-  events={events}
-  bookedEvents={bookedEvents}
-  userLocation={userLocation}
-  onBook={handleBooking}
-  onCancel={handleCancel}
-  onAddPress={() => router.push('/create-event')}
-  isLoggedIn={!!user?.emailAddresses?.[0]?.emailAddress}
-/>
+            events={events}
+            bookedEvents={bookedEvents}
+            userLocation={userLocation}
+            onBook={handleBooking}
+            onCancel={handleCancel}
+            onAddPress={() => router.push('/create-event')}
+            isLoggedIn={!!user?.emailAddresses?.[0]?.emailAddress}
+          />
 
         </ScrollView>
       </View>

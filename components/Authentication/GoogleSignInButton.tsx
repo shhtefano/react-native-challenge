@@ -35,7 +35,8 @@ export function GoogleSignInButton() {
   return (
     <TouchableOpacity style={styles.button} onPress={handlePress}>
       <Image
-        source={require('../assets/Google_logo.png')}
+        source={require('../../assets/Google_logo.png')}
+        alt="Google Icon"
         style={styles.icon}
       />
       <Text style={styles.text}>Sign in with Google</Text>

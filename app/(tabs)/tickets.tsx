@@ -1,9 +1,10 @@
 import { Stack } from 'expo-router';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { getBookingsByMail } from '~/lib/events';
 import { useUser } from '@clerk/clerk-expo';
 import TicketCard from '~/components/Events/TicketCard';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function TicketsPage() {
   const [bookedEvents, setBookedEvents] = useState<any[]>([]);
@@ -17,9 +18,11 @@ export default function TicketsPage() {
     }
   }, [user]);
 
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchBookings();
+    }, [fetchBookings])
+  );
 
   const future = bookedEvents.filter((e) => !isPastEvent(e));
   const past = bookedEvents.filter((e) => isPastEvent(e));
@@ -37,39 +40,31 @@ export default function TicketsPage() {
       />
       <View style={{ flex: 1, backgroundColor: '#121212' }}>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-          {!user ? (
-            <Text style={styles.emptyText}>
-              Per vedere le prenotazioni, effettua il login.
-            </Text>
+          <Text style={styles.heading}>Eventi a cui sei accreditato</Text>
+          {future.length > 0 ? (
+            future.map((e) => (
+              <TicketCard
+                key={`${e.id}`}
+                event={e}
+                isPast={false}
+                onCancelled={fetchBookings}
+              />
+            ))
           ) : (
-            <>
-              <Text style={styles.heading}>Eventi a cui sei accreditato</Text>
-              {future.length > 0 ? (
-                future.map((e) => (
-                  <TicketCard
-                    key={`${e.id}`}
-                    event={e}
-                    isPast={false}
-                    onCancelled={fetchBookings}
-                  />
-                ))
-              ) : (
-                <Text style={styles.emptyText}>Nessuna prenotazione attiva.</Text>
-              )}
+            <Text style={styles.emptyText}>Nessuna prenotazione attiva.</Text>
+          )}
 
-              <Text style={[styles.heading, { marginTop: 40 }]}>Eventi passati</Text>
-              {past.length > 0 ? (
-                past.map((e) => (
-                  <TicketCard
-                    key={`${e.id}`}
-                    event={e}
-                    isPast={true}
-                  />
-                ))
-              ) : (
-                <Text style={styles.emptyText}>Nessun evento passato.</Text>
-              )}
-            </>
+          <Text style={styles.heading}>Eventi a cui hai già partecipato</Text>
+          {past.length > 0 ? (
+            past.map((e) => (
+              <TicketCard
+                key={`${e.id}-past`}
+                event={e}
+                isPast={true}
+              />
+            ))
+          ) : (
+            <Text style={styles.emptyText}>Nessun evento passato trovato.</Text>
           )}
         </ScrollView>
       </View>
@@ -88,13 +83,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 26,
-    marginBottom: 26,
+    marginBottom: 16,
   },
   emptyText: {
     color: '#ccc',
     fontStyle: 'italic',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 16,
   },
 });

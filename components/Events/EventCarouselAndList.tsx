@@ -274,7 +274,7 @@ export default function EventCarouselAndList({
                                     {e.booked_count} / {e.max_guests} posti prenotati
                                 </Text>
                                 <Text style={[styles.statText, { marginTop: 8, color: partecipato ? '#aaffaa' : '#ffaaaa' }]}>
-                                    {partecipato ? '✔ Hai partecipato a questo evento' : 'Non hai partecipato.'}
+                                    {partecipato ? 'Hai partecipato a questo evento!' : 'Non hai partecipato.'}
                                 </Text>
                             </View>
                         );

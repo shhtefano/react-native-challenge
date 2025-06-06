@@ -68,7 +68,7 @@ export default function CreateEvent() {
 
     return (
         <>
-            <Stack.Screen options={{ title: '' }} />
+            <Stack.Screen options={{ title: '', headerBackTitle: 'Back'}} />
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -146,7 +146,7 @@ export default function CreateEvent() {
                             placeholder="Latitudine"
                             placeholderTextColor="#aaa"
                             keyboardType="numeric"
-                            value={latitude}
+    value={latitude ? parseFloat(latitude).toFixed(5) : ''} // <-- modifica qui
                             onChangeText={setLatitude}
                             returnKeyType="done"
                         />
@@ -155,7 +155,7 @@ export default function CreateEvent() {
                             placeholder="Longitudine"
                             placeholderTextColor="#aaa"
                             keyboardType="numeric"
-                            value={longitude}
+    value={longitude ? parseFloat(longitude).toFixed(5) : ''} // <-- modifica qui
                             onChangeText={setLongitude}
                             returnKeyType="done"
                         />
