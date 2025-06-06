@@ -64,7 +64,7 @@ export async function bookEvent(eventId: string, mail: string): Promise<void> {
   // 3. Inserisci la prenotazione
   const { error: insertError } = await supabase
     .from('bookings')
-    .insert([{ event_id: eventId, mail, created_at: new Date().toISOString() }]);
+    .insert([{ event_id: eventId, mail, created_at: new Date().toLocaleString() }]);
 
   if (insertError) {
     console.error('Errore nella prenotazione:', insertError.message);
@@ -93,7 +93,7 @@ export async function getActiveBookingsCount(): Promise<number> {
   const userId = session?.user?.id;
   if (!userId) return 0;
 
-  const now = new Date().toISOString();
+  const now = new Date().toLocaleString();
 
   const { data, error } = await supabase
     .from('bookings')

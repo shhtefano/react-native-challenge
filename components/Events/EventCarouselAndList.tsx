@@ -88,6 +88,7 @@ export default function EventCarouselAndList({
                     <Text style={styles.eventTitle}>{e.title}</Text>
                     <Text style={styles.date}>
                         {new Date(e.date).toLocaleString('it-IT', {
+                            timeZone: 'Europe/Rome',
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
@@ -158,6 +159,9 @@ export default function EventCarouselAndList({
 
     const futureBookings = bookedEvents.filter(e => !isPastEvent(e));
     const past = bookedEvents.filter(isPastEvent);
+    const allPastEvents = events.filter(isPastEvent);
+    const hasBooked = (event: Event) =>
+        bookedEvents.some((b) => b.id === event.id);
 
     return (
         <View>
@@ -190,6 +194,7 @@ export default function EventCarouselAndList({
                             >
                                 <Text style={styles.eventTitle}>{e.title}</Text>
                                 <Text style={styles.date}>{new Date(e.date).toLocaleString('it-IT', {
+                                    timeZone: 'Europe/Rome',
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',
@@ -247,17 +252,37 @@ export default function EventCarouselAndList({
 
 
             <Text style={styles.heading}>Eventi passati</Text>
-            {past.length > 0 ? (
-                past.map((e) => (
-                    <TicketCard
-                        key={`past-${e.id}`}
-                        event={e}
-                        isPast={true}
-                    />
-                ))
+            {allPastEvents.length > 0 ? (
+                allPastEvents
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .map((e) => {
+                        const partecipato = hasBooked(e);
+                        return (
+                            <View key={`past-${e.id}`} style={[styles.card, styles.cardFull]}>
+                                <Text style={styles.eventTitle}>{e.title}</Text>
+                                <Text style={styles.date}>{new Date(e.date).toLocaleString('it-IT', {
+                                    timeZone: 'Europe/Rome',
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                })}</Text>
+                                <Text style={styles.location}>{e.location}</Text>
+                                <Text style={styles.booked}>
+                                    {e.booked_count} / {e.max_guests} posti prenotati
+                                </Text>
+                                <Text style={[styles.statText, { marginTop: 8, color: partecipato ? '#aaffaa' : '#ffaaaa' }]}>
+                                    {partecipato ? '✔ Hai partecipato a questo evento' : 'Non hai partecipato.'}
+                                </Text>
+                            </View>
+                        );
+                    })
             ) : (
                 <Text style={styles.emptyText}>Nessun evento passato.</Text>
             )}
+
             <Modal visible={!!selectedQrCode} transparent animationType="fade" onRequestClose={() => setSelectedQrCode(null)}>
                 <View style={styles.modalContainer}>
                     <TouchableOpacity style={styles.modalBackground} onPress={() => setSelectedQrCode(null)} />
@@ -292,6 +317,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'flex-start',
     },
+    statText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+
     leftColumn: {
         flex: 1,
         paddingRight: 8,

@@ -17,6 +17,7 @@ import { TouchableOpacity } from 'react-native';
 
 export default function Dicegame() {
   const { diceCount, setDiceCount } = useDiceStore();
+  const [diceInput, setDiceInput] = useState(diceCount.toString());
   const [results, setResults] = useState<number[]>([]);
   const [rolling, setRolling] = useState(false);
 
@@ -38,6 +39,8 @@ export default function Dicegame() {
 
   const total = results.reduce((a, b) => a + b, 0);
   const average = results.length ? (total / results.length).toFixed(2) : '0';
+  const isButtonDisabled =
+    !diceInput || isNaN(parseInt(diceInput)) || parseInt(diceInput) < 1 || parseInt(diceInput) > 10;
 
   return (
     <>
@@ -49,53 +52,62 @@ export default function Dicegame() {
           <Text style={styles.label}>Numero di dadi (1–10):</Text>
           <TextInput
             keyboardType="numeric"
-            value={diceCount.toString()}
+            value={diceInput}
             onChangeText={(text) => {
+              setDiceInput(text); // sempre aggiorni il valore visivo
               const parsed = parseInt(text, 10);
-              if (!isNaN(parsed)) setDiceCount(parsed);
+              if (!isNaN(parsed)) {
+                setDiceCount(parsed); // aggiorni lo store solo se valido
+              }
             }}
             style={styles.input}
             maxLength={2}
           />
 
 
-<TouchableOpacity onPress={handleRoll} activeOpacity={0.8} style={styles.rollButton}>
-  <Text style={styles.rollButtonText}>Lancia!</Text>
-</TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleRoll}
+            activeOpacity={0.8}
+            style={[styles.rollButton, isButtonDisabled && { opacity: 0.5 }]}
+            disabled={isButtonDisabled}
+          >
+            <Text style={styles.rollButtonText}>Lancia!</Text>
+          </TouchableOpacity>
+
 
           <View style={styles.resultsContainer}>
             <Text style={styles.subtitle}>Risultati:</Text>
 
             {!rolling && <>
-            
-            <View style={styles.diceRow}>
-              <AnimatePresence>
-                {results.map((val, i) => (
-                  <MotiView
-                    key={i}
-                    from={{ scale: 0, opacity: 0, rotate: '0deg' }}
-                    animate={{ scale: 1, opacity: 1, rotate: '360deg' }}
-                    transition={{ type: 'timing', duration: 400, delay: i * 100 }}
-                    style={styles.die}
-                  >
-                    <Text style={styles.dieText}>🎲 {val}</Text>
-                  </MotiView>
-                ))}
-              </AnimatePresence>
 
-              
-            </View>
-            
-            {results.length > 0 && (
-              <View style={styles.stats}>
-                <Text style={styles.statText}>🔢 Somma: {total}</Text>
-                <Text style={styles.statText}>📊 Media: {average}</Text>
+              <View style={styles.diceRow}>
+                <AnimatePresence>
+                  {results.map((val, i) => (
+                    <MotiView
+                      key={i}
+                      from={{ scale: 0, opacity: 0, rotate: '0deg' }}
+                      animate={{ scale: 1, opacity: 1, rotate: '360deg' }}
+                      transition={{ type: 'timing', duration: 400, delay: i * 100 }}
+                      style={styles.die}
+                    >
+                      <Text style={styles.dieText}>🎲 {val}</Text>
+                    </MotiView>
+                  ))}
+                </AnimatePresence>
+
+
               </View>
-            )}
+
+              {results.length > 0 && (
+                <View style={styles.stats}>
+                  <Text style={styles.statText}>🔢 Somma: {total}</Text>
+                  <Text style={styles.statText}>📊 Media: {average}</Text>
+                </View>
+              )}
             </>
             }
 
-           
+
 
             {rolling && <Text style={styles.rollingText}>🌀 Lancio in corso...</Text>}
           </View>
@@ -190,12 +202,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
   },
-  
+
   rollButtonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  
+
 });

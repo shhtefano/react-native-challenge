@@ -15,6 +15,8 @@ import { supabase } from '~/lib/supabase';
 import SelectLocation from '../../components/Events/SelectLocation';
 import { useUser } from '@clerk/clerk-expo';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import dayjs from 'dayjs';
+
 export default function CreateEvent() {
     const router = useRouter();
     const [title, setTitle] = useState('');
@@ -42,7 +44,8 @@ export default function CreateEvent() {
                 latitude: parseFloat(latitude),
                 longitude: parseFloat(longitude),
                 max_guests: parseInt(maxGuests),
-                date: selectedDate?.toISOString(),
+                date: dayjs(selectedDate).format('YYYY-MM-DDTHH:mm:ss')
+,
                 owner: user?.emailAddresses[0].emailAddress!!,
                 booked_count: 0,
             },
@@ -66,9 +69,15 @@ export default function CreateEvent() {
     return (
         <>
             <Stack.Screen options={{ title: '' }} />
-            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-                <ScrollView style={styles.scrollContainer}
-                    contentContainerStyle={styles.container}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+                <ScrollView
+                    style={styles.scrollContainer}
+                    contentContainerStyle={styles.container}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <Text style={styles.title}>Nuovo Evento</Text>
 
                     <TextInput
@@ -77,6 +86,7 @@ export default function CreateEvent() {
                         placeholderTextColor="#aaa"
                         value={title}
                         onChangeText={setTitle}
+                        returnKeyType="done"
                     />
                     <TextInput
                         style={styles.input}
@@ -84,6 +94,7 @@ export default function CreateEvent() {
                         placeholderTextColor="#aaa"
                         value={location}
                         onChangeText={setLocation}
+                        returnKeyType="done"
                     />
 
 
@@ -94,12 +105,21 @@ export default function CreateEvent() {
                         keyboardType="numeric"
                         value={maxGuests}
                         onChangeText={setMaxGuests}
+                        returnKeyType="done"
+
                     />
 
 
                     <TouchableOpacity onPress={() => setDatePickerVisibility(true)} style={styles.mapButton}>
                         <Text style={styles.mapButtonText}>
-                            {selectedDate ? '📅 ' + selectedDate.toLocaleString() : '📅 Scegli data e ora'}
+                            {selectedDate ? '📅 ' + selectedDate.toLocaleString('it-IT', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                            }) : '📅 Scegli data e ora'}
                         </Text>
                     </TouchableOpacity>
 
@@ -128,6 +148,7 @@ export default function CreateEvent() {
                             keyboardType="numeric"
                             value={latitude}
                             onChangeText={setLatitude}
+                            returnKeyType="done"
                         />
                         <TextInput
                             style={[styles.input, styles.halfInput]}
@@ -136,6 +157,7 @@ export default function CreateEvent() {
                             keyboardType="numeric"
                             value={longitude}
                             onChangeText={setLongitude}
+                            returnKeyType="done"
                         />
                     </View>
                     {/* <TextInput

@@ -22,7 +22,7 @@ export default function Homepage() {
       <StatusBar style="light" />
 
       <Stack.Screen options={{
-        title: 'Home', headerTintColor: '#fff', headerBackTitle: 'Home', headerStyle: { backgroundColor: 'black' }, headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
+        title: 'Home', headerTintColor: '#fff', headerBackTitle: '', headerStyle: { backgroundColor: 'black' }, headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
       }} />
 
       <Image
@@ -37,7 +37,7 @@ export default function Homepage() {
         <Stack.Screen options={{
           title: 'Home',
           headerTintColor: '#fff',
-          headerBackTitle: 'Home',
+          headerBackTitle: '',
           headerStyle: { backgroundColor: 'black' },
           headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
           headerRight: () => (
@@ -69,7 +69,7 @@ export default function Homepage() {
         <Stack.Screen options={{
           title: 'Home',
           headerTintColor: '#fff',
-          headerBackTitle: 'Home',
+          headerBackTitle: '',
           headerStyle: { backgroundColor: 'black' },
           headerTitleStyle: { fontFamily: 'PlayRegular', fontSize: 20 },
           headerRight: () => null,
