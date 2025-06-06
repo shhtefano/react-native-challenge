@@ -48,3 +48,5 @@ Tre strumenti utili:
 - Impostazioni profilo (nome, foto)
 - Geolocalizzazione per calcolo distanza evento
 - Generazione QR code per eventi prenotati.
+
+## E' possibile vedere immagini della demo nella cartella screenshots.
